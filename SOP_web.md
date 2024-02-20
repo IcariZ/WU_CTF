@@ -9,5 +9,6 @@ Burp
 Tools: - [DIG](https://www.ibm.com/docs/pl/aix/7.1?topic=d-dig-command) (domain name)
 
 ### Injection/Payload
-### Network
+#### What is the vuln?
+
 
